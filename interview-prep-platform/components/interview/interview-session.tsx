@@ -20,7 +20,7 @@ export const InterviewSession = ({ role, level, duration, onEnd }: InterviewSess
   )
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [interViewStatus, setInterviewStatus] = useState<'loading' | 'started' | 'idle'>('idle');
-  const interviewRef = useRef<null | HTMLDivElement>(null)
+  const interviewRef = useRef<null | HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -72,15 +72,75 @@ export const InterviewSession = ({ role, level, duration, onEnd }: InterviewSess
     }
   }
 
+  const handleSendUsersVoice = async (blob: Blob) => {
+    const formData = new FormData();
+    formData.append("file", blob, "response.wav");
+    try {
+      const api = await fetch(`/api/interview`, {
+        method: "POST",
+        body: formData,
+      })
+      const arrayBuffer = await api.arrayBuffer();
+      const audioBlob = new Blob([arrayBuffer], { type: "audio/wav" });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      setAudioUrl(audioUrl)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   const handleInterview = () => {
     setIsRecording(prev => !prev);
     if(!isRecording){
-      setInterviewStatus('loading')
-      handleAiIntroduction()
+      setInterviewStatus('loading');
+      handleAiIntroduction();
+      (window as any).toggleVAD();
       return
     }
     setInterviewStatus('idle')
   }
+
+  useEffect(() => {
+    const initVAD = async () => {
+      const { interpolateInferno } = await import("d3-scale-chromatic");
+
+      try {
+        const myvad = await (window as any).vad.MicVAD.new({
+          model: "v5",
+          positiveSpeechThreshold: 0.4,
+          negativeSpeechThreshold: 0.4,
+          minSpeechFrames: 15,
+          preSpeechPadFrames: 30,
+          onFrameProcessed: (probs: any) => {
+            const indicatorColor = interpolateInferno(probs.isSpeech / 2);
+            document.body.style.setProperty("--indicator-color", indicatorColor);
+          },
+          onSpeechEnd: (arr: Float32Array) => {
+            const wavBuffer = (window as any).vad.utils.encodeWAV(arr);
+            const blob = new Blob([wavBuffer], { type: "audio/wav" });
+            handleSendUsersVoice(blob)
+          },
+          onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
+          baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.28/dist/",
+        });
+
+        (window as any).myvad = myvad;
+
+        (window as any).toggleVAD = () => {
+          if (myvad.listening === false) {
+            myvad.start();
+          } else {
+            myvad.pause();
+            const indicatorColor = interpolateInferno(0);
+            document.body.style.setProperty("--indicator-color", indicatorColor);
+          }
+        };
+      } catch (e) {
+        console.error("Failed:", e);
+      }
+    }
+
+    initVAD();
+  }, []);
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto space-y-6">
