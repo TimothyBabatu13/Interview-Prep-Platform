@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -11,13 +11,16 @@ interface InterviewSessionProps {
   onEnd: () => void
 }
 
-export function InterviewSession({ role, level, duration, onEnd }: InterviewSessionProps) {
+export const InterviewSession = ({ role, level, duration, onEnd }: InterviewSessionProps) => {
   const [timeLeft, setTimeLeft] = useState(duration * 60)
   const [isRecording, setIsRecording] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [aiMessage, setAiMessage] = useState(
     "Welcome to your mock interview! I'll be asking you questions about your experience and skills. Feel free to take a moment to think before responding.",
   )
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [interViewStatus, setInterviewStatus] = useState<'loading' | 'started' | 'idle'>('idle');
+  const interviewRef = useRef<null | HTMLDivElement>(null)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -42,12 +45,48 @@ export function InterviewSession({ role, level, duration, onEnd }: InterviewSess
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
 
+  const handleAiIntroduction = async () => {
+    try {
+
+      const api = await fetch(`/api/introduction`, {
+        method: "POST",
+      });
+
+      if(api.status === 500){
+        console.log('server error')
+        return;
+      }
+
+      if(api.status === 401){
+        console.log('unauthorized');
+        return;
+      }
+      
+      const response = await api.blob();
+      setInterviewStatus('started')
+      const url = URL.createObjectURL(response);
+      setAudioUrl(url)
+      interviewRef.current?.scrollIntoView({block: 'start', behavior: 'smooth'})
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleInterview = () => {
+    setIsRecording(prev => !prev);
+    if(!isRecording){
+      setInterviewStatus('loading')
+      handleAiIntroduction()
+      return
+    }
+    setInterviewStatus('idle')
+  }
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Timer */}
         <div className="flex justify-between items-center">
-          <div>
+          <div ref={interviewRef}>
             <h1 className="text-2xl font-bold text-foreground">Interview Session</h1>
             <p className="text-muted-foreground">
               {role} - {level}
@@ -93,6 +132,13 @@ export function InterviewSession({ role, level, duration, onEnd }: InterviewSess
           </Card>
         </div>
 
+        {audioUrl && (
+        <audio className="hidden" controls autoPlay src={audioUrl}>
+          Your browser does not support the audio element.
+        </audio>
+      )}
+
+
         {/* Transcript Area */}
         <Card>
           <CardContent className="p-6">
@@ -106,12 +152,13 @@ export function InterviewSession({ role, level, duration, onEnd }: InterviewSess
         {/* Controls */}
         <div className="flex gap-3 justify-center">
           <Button
-            onClick={() => setIsRecording(!isRecording)}
-            variant={isRecording ? "destructive" : "default"}
+            onClick={handleInterview}
+            variant={interViewStatus === 'started' ? "destructive" : "default"}
             size="lg"
             className="min-w-40"
+            disabled={interViewStatus === 'loading'}
           >
-            {isRecording ? "Stop Recording" : "Start Recording"}
+            {interViewStatus === 'loading' ? "Starting Recording" : interViewStatus === 'started' ? "Stop Recording" : "Start Recording"}
           </Button>
           <Button onClick={handleEndSession} variant="outline" size="lg" className="min-w-40 bg-transparent">
             End Interview
