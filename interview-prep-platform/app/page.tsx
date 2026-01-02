@@ -1,32 +1,12 @@
-"use client"
 
-import { useEffect } from "react"
+import Header from "@/components/shared_ui/Header"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-export default function Home() {
-  useEffect(() => {
-    const email = localStorage.getItem("user_email")
-    if (email) {
-      window.location.href = "/dashboard"
-    }
-  }, [])
-
+const Home = () => {
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border sticky top-0 bg-card/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">InterviewPrep</h1>
-          <div className="flex gap-2">
-            <Link href="/login">
-              <Button variant="ghost">Sign In</Button>
-            </Link>
-            <Link href="/signup">
-              <Button>Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center space-y-6 max-w-2xl mx-auto">
           <h2 className="text-5xl font-bold text-balance">Master Your Interviews with AI</h2>
@@ -69,3 +49,5 @@ export default function Home() {
     </main>
   )
 }
+
+export default Home

@@ -30,7 +30,7 @@ export const POST = async (req: NextRequest) => {
         });
 
         const aiText = chat.choices[0]?.message?.content ?? "Sorry, no response";
-
+        console.log(aiText)
         const speech = await groq.audio.speech.create({
             model: "canopylabs/orpheus-v1-english",
             voice: "hannah",
