@@ -12,3 +12,12 @@ export const formatZodError = (error: ZodError) => {
     return `${e.message}`;
   }).join("\n");
 };
+
+
+export const getFingerprint = (req: Request) => {
+  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const ua = req.headers.get("user-agent") || "unknown";
+  const lang = req.headers.get("accept-language") || "unknown";
+
+  return `${ip}:${ua}:${lang}`;
+}
