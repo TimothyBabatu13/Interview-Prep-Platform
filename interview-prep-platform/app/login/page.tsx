@@ -5,7 +5,7 @@ export const metadata = {
   description: "Sign in to your interview preparation dashboard",
 }
 
-export default function LoginPage() {
+const LoginPage = () => {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -18,3 +18,5 @@ export default function LoginPage() {
     </main>
   )
 }
+
+export default LoginPage

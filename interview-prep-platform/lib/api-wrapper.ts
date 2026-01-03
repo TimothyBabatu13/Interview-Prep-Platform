@@ -32,8 +32,8 @@ export const makeRequest = async (url: string, init?: RequestInit) => {
     try {
         const api = await fetch(url, init);
         const res = await api.json()
-        if(api.status === 400){
-            ErrorToast(res as string);
+        if(api.status !== 201 && api.status !== 200){
+            ErrorToast(res.message as string);
             return;       
         }
         return res;

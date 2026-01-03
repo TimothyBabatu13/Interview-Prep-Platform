@@ -8,25 +8,42 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ErrorToast } from "../ui/toast"
+import { makeRequest } from "@/lib/api-wrapper"
+import { SignInValidation } from "@/validations/auth"
+import { formatZodError } from "@/lib/utils"
 
-export function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+export const LoginForm = () => {
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  })
+
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
+    
+    const { success: validationSuccess, data: ValidatedData, error: validationError } = SignInValidation.safeParse(form);
+
+    if(!validationSuccess){
+      ErrorToast(formatZodError(validationError));
+      setIsLoading(false)
+      return;
+    }
 
     try {
-      // TODO: Implement actual authentication
-      // For now, simulate successful login
-      localStorage.setItem("user_email", email)
-      window.location.href = "/dashboard"
+      const res = await makeRequest('/api/auth/login',{
+        method: "POST",
+        body: JSON.stringify(ValidatedData)
+      })
+      if(!res) return;
+      console.log(res)
     } catch (err) {
-      setError("Login failed. Please try again.")
+      const error = err as Error;
+      console.log(error)
+      ErrorToast(error.message);
     } finally {
       setIsLoading(false)
     }
@@ -40,15 +57,17 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">{error}</div>}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={(e) => setForm(prev =>({
+                ...prev,
+                email: e.target.value
+              }))}
               required
             />
           </div>
@@ -58,8 +77,11 @@ export function LoginForm() {
               id="password"
               type="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={(e) => setForm(prev => ({
+                ...prev,
+                password: e.target.value
+              }))}
               required
             />
           </div>
