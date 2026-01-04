@@ -12,8 +12,11 @@ import { ErrorToast } from "../ui/toast"
 import { makeRequest } from "@/lib/api-wrapper"
 import { SignInValidation } from "@/validations/auth"
 import { formatZodError } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { setToken } from "@/lib/memory"
 
 export const LoginForm = () => {
+  const router = useRouter()
   const [form, setForm] = useState({
     email: "",
     password: ""
@@ -39,7 +42,10 @@ export const LoginForm = () => {
         body: JSON.stringify(ValidatedData)
       })
       if(!res) return;
-      console.log(res)
+      if(res.token){
+        setToken(res.token as string);
+        router.push('/dashboard')
+      }
     } catch (err) {
       const error = err as Error;
       console.log(error)

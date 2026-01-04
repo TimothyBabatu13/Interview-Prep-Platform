@@ -1,17 +1,9 @@
 import { hashPassword } from "@/lib/hash";
-import { formatZodError, getFingerprint } from "@/lib/utils";
+import { calculateTime, formatZodError, getFingerprint } from "@/lib/utils";
 import { SignUpValidation } from "@/validations/auth";
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from '@/lib/supabase/server';
 import { ratelimit } from "@/lib/upstash/rate-limit";
-
-const calculateTime = (num: number) => {
-    const now = Date.now();
-    const diffMs = num - now;
-    const diffMinutes = Math.ceil(diffMs / 1000 / 60);
-    const readable = `${diffMinutes} minutes remaining`;
-    return readable
-}
 
 export const POST = async (req: NextRequest) => {
     try {
@@ -31,7 +23,7 @@ export const POST = async (req: NextRequest) => {
         }
         const identifier = `${fingerprint}:${email}`;
         const { success, remaining, reset } = await ratelimit.limit(identifier);
-        console.log(remaining)
+   
         if (!success) {
             return NextResponse.json({ message: `Too many requests. Reset in ${calculateTime(reset)}`},{ status: 429 });
         }

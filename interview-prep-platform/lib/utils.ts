@@ -21,3 +21,11 @@ export const getFingerprint = (req: Request) => {
 
   return `${ip}:${ua}:${lang}`;
 }
+
+export const calculateTime = (num: number) => {
+  const now = Date.now();
+  const diffMs = num - now;
+  const diffMinutes = Math.ceil(diffMs / 1000 / 60);
+  const readable = `${diffMinutes} minutes remaining`;
+  return readable
+}
