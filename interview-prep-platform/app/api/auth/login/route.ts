@@ -1,8 +1,9 @@
+import { ACCESS_TOKEN, REFRESH_TOKEN, REFRESH_TOKEN_MAX_AGE } from "@/constants/constants";
 import { verifyPassword } from "@/lib/hash";
-import { decryptAccessToken, encryptAccessToken } from "@/lib/jwt";
+import { encryptToken } from "@/lib/jwt";
 import { createClient } from "@/lib/supabase/server";
 import { ipSigninLimit, userSigninLimit } from "@/lib/upstash/rate-limit";
-import { calculateTime, formatZodError, getFingerprint } from "@/lib/utils";
+import { accessTokenExpireTime, calculateTime, formatZodError, getFingerprint } from "@/lib/utils";
 import { SignInValidation } from "@/validations/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -60,26 +61,32 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
         }
 
-        const accessToken = encryptAccessToken(user.id);
-        const refreshToken = crypto.randomUUID();
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        
-        const { error } = await supabase
-        .from("sessions")
-        .insert([{
-            user_id: user.id,
-            refresh_token: refreshToken,
-            expires_at: expiresAt.toISOString(),
-        }]);
+        const accessToken = encryptToken(user.id, '5m');
+        const refreshToken = encryptToken(user.id, '7d');
 
-        if(error){
-            return NextResponse.json({ message: "Failed to create session" }, { status: 500 });
-        }
-        return NextResponse.json({
+        const response = NextResponse.json({
             message: "Account Login Successfullly",
-            token: accessToken
-        }, { status: 200 })
+            token: accessToken,
+            data: { email: user?.email, id: user?.id }
+        }, { status: 200 });
 
+        response.cookies.set(ACCESS_TOKEN, accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: accessTokenExpireTime()
+        }) 
+
+        response.cookies.set(REFRESH_TOKEN, refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: REFRESH_TOKEN_MAX_AGE
+        }) 
+
+        return response;
     } catch (error) {
         const err = error as Error;
         return NextResponse.json({message: "Unexpected Server error"}, { status: 500 })

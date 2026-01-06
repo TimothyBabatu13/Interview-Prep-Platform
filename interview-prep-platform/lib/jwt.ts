@@ -1,16 +1,17 @@
 import jwt from "jsonwebtoken";
+import { StringValue } from "ms";
 
 const secret = process.env.JWT_SECRET!
 
-export const encryptAccessToken = (id: string) => {
+export const encryptToken = (id: string, time: number | StringValue) => {
   return jwt.sign(
     { userId: id },
     secret,
-    { expiresIn: "5m" }
+    { expiresIn: time }
   );
 }
 
-export const decryptAccessToken = (token: string) => {
+export const decryptToken = (token: string) => {
   try {
     const payload = jwt.verify(token, secret);
     return payload;

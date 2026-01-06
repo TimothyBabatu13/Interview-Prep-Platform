@@ -29,3 +29,8 @@ export const calculateTime = (num: number) => {
   const readable = `${diffMinutes} minutes remaining`;
   return readable
 }
+
+export const accessTokenExpireTime = () => {
+  const expiresAt5m = 60 * 5;
+  return expiresAt5m
+}

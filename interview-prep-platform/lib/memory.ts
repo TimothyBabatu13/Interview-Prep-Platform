@@ -16,3 +16,12 @@ export const getToken = async () => {
         return null
     }
 }
+
+export const removeToken = async () => {
+    try {
+        const result = localStorage.removeItem(key);
+        return true
+    } catch (error) {
+        return false
+    }
+}
