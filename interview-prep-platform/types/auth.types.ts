@@ -1,22 +1,20 @@
+export interface USER_TYPE { 
+    email: string, 
+    id: string 
+}
 export interface DECREPTED_JWT_TYPE {
     userId: string, 
     iat: number, 
     exp: number 
 }
 
-export interface USER_TYPE {
+export interface ME_TYPE {
     message: string, 
-    data: { 
-        email: string, 
-        id: string 
-    }
+    data: USER_TYPE
 }
 
 export interface LOGIN_TYPE {
     message: string,
     token: string,
-    data: { 
-        email: string, 
-        id: string 
-    }
+    data: USER_TYPE
 }

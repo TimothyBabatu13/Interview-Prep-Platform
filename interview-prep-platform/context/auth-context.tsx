@@ -2,18 +2,23 @@
 
 import { apiClient } from "@/lib/api/api-client";
 import { getToken } from "@/lib/memory";
+import { ME_TYPE, USER_TYPE } from "@/types/auth.types";
 import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 
 interface ContextProps {
   isLoading: boolean,
   userId: string | null,
-  setUserId: Dispatch<SetStateAction<string | null>>
+  setUserId: Dispatch<SetStateAction<string | null>>,
+  user: USER_TYPE | null,
+  setUser: Dispatch<SetStateAction<USER_TYPE | null>>
 }
 
 const Context = createContext<ContextProps>({
   isLoading: true,
   userId: null,
-  setUserId: () => {}
+  setUserId: () => {},
+  user: null,
+  setUser: () =>{}
 });
 
 const AuthContext = ({  children } : {
@@ -23,15 +28,20 @@ const AuthContext = ({  children } : {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+  const [user, setUser] = useState<USER_TYPE | null>(null);
+
   const fetchUserToken = async () => {
     try {
       const result = await getToken();
       if(!result) return;
-      const user = await apiClient('/api/auth/me', {
+
+      const user = await apiClient<ME_TYPE>('/api/auth/me', {
         method: "GET"
       })
-      console.log(user);
+
+      if(user){
+        setUser(user.data);
+      }
 
     } catch (error) {
       const err = error as Error
@@ -48,7 +58,7 @@ const AuthContext = ({  children } : {
 
 
   return (
-    <Context.Provider value={{isLoading: isLoading, setUserId: setUserId, userId: userId}}>
+    <Context.Provider value={{isLoading: isLoading, setUserId: setUserId, userId: userId, user: user, setUser:setUser}}>
         {children}
     </Context.Provider>
   )

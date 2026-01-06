@@ -14,9 +14,12 @@ import { SignInValidation } from "@/validations/auth"
 import { formatZodError } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { setToken } from "@/lib/memory"
+import { LOGIN_TYPE } from "@/types/auth.types"
+import { useAuthProvider } from "@/context/auth-context"
 
 export const LoginForm = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const { setUser } = useAuthProvider()
   const [form, setForm] = useState({
     email: "",
     password: ""
@@ -42,8 +45,11 @@ export const LoginForm = () => {
         body: JSON.stringify(ValidatedData)
       })
       if(!res) return;
-      if(res.token){
+      const result = res as LOGIN_TYPE
+      
+      if(result.token){
         setToken(res.token as string);
+        setUser(result.data);
         router.push('/dashboard')
       }
     } catch (err) {

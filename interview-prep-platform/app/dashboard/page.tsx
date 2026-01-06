@@ -6,6 +6,7 @@ import { CreditsCard } from "@/components/dashboard/credits-card"
 import { ResumeUpload } from "@/components/dashboard/resume-upload"
 import { FeedbackSection } from "@/components/dashboard/feedback-section"
 import { InterviewSection } from "@/components/dashboard/interview-section"
+import { useAuthProvider } from "@/context/auth-context"
 
 interface Feedback {
   id: string
@@ -16,6 +17,7 @@ interface Feedback {
 }
 
 export default function DashboardPage() {
+  const { isLoading, user } = useAuthProvider()
   const [userEmail, setUserEmail] = useState<string>("")
   const [credits, setCredits] = useState(5)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([
@@ -35,16 +37,6 @@ export default function DashboardPage() {
       date: "Dec 15, 2024",
     },
   ])
-
-  useEffect(() => {
-    // Check if user is logged in
-    const email = localStorage.getItem("user_email")
-    if (!email) {
-      window.location.href = "/login"
-    } else {
-      setUserEmail(email)
-    }
-  }, [])
 
   function handleResumeUpload(file: File) {
     console.log("Resume uploaded:", file.name)
