@@ -10,18 +10,18 @@ interface ResumeUploadProps {
   onUpload?: (file: File) => void
 }
 
-export function ResumeUpload({ onUpload }: ResumeUploadProps) {
+export const ResumeUpload = ({ onUpload }: ResumeUploadProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
       setFile(selectedFile)
     }
   }
 
-  async function handleUpload() {
+  const handleUpload = async () => {
     if (!file) return
 
     setIsUploading(true)

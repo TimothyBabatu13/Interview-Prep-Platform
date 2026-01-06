@@ -3,11 +3,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-interface CreditsCardProps {
-  credits: number
-}
 
-export function CreditsCard({ credits }: CreditsCardProps) {
+export const CreditsCard = () => {
+  const credits = 5;
   return (
     <Card className="border-primary/20">
       <CardHeader className="pb-3">

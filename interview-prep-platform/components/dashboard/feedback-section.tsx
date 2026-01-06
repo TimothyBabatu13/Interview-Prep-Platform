@@ -15,7 +15,26 @@ interface FeedbackSectionProps {
   feedbacks: Feedback[]
 }
 
-export function FeedbackSection({ feedbacks }: FeedbackSectionProps) {
+const feedbacks = [
+    {
+      id: "1",
+      title: "Initial Resume Review",
+      score: 8,
+      feedback:
+        "Strong technical background. Consider adding more quantifiable achievements and metrics to demonstrate impact.",
+      date: "Dec 15, 2024",
+    },
+    {
+      id: "2",
+      title: "Format and Structure",
+      score: 9,
+      feedback: "Excellent formatting. The layout is clean and easy to scan. Good use of white space.",
+      date: "Dec 15, 2024",
+    },
+  ]
+
+export const FeedbackSection = () => {
+  
   return (
     <Card>
       <CardHeader>

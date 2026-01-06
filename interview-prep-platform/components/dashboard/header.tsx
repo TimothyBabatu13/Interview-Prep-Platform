@@ -1,14 +1,15 @@
 "use client"
 import { Button } from "@/components/ui/button"
+import { useAuthProvider } from "@/context/auth-context"
 
-interface DashboardHeaderProps {
-  userEmail?: string
-}
+export const DashboardHeader = () => {
+  const { user } = useAuthProvider()
 
-export function DashboardHeader({ userEmail }: DashboardHeaderProps) {
-  function handleLogout() {
-    localStorage.removeItem("user_email")
-    window.location.href = "/login"
+  const handleLogout = async () => {
+    try {
+    } catch (error) {
+      
+    }
   }
 
   return (
@@ -19,7 +20,7 @@ export function DashboardHeader({ userEmail }: DashboardHeaderProps) {
           <p className="text-sm text-muted-foreground">Welcome back</p>
         </div>
         <div className="flex items-center gap-4">
-          {userEmail && <p className="text-sm text-muted-foreground">{userEmail}</p>}
+          {user && <p className="text-sm text-muted-foreground">{user.email}</p>}
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             Logout
           </Button>

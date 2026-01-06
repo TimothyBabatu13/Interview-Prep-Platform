@@ -27,7 +27,6 @@ const AuthContext = ({  children } : {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<USER_TYPE | null>(null);
 
   const fetchUserToken = async () => {
@@ -73,3 +72,12 @@ export const useAuthProvider = () => {
     }
     return context
 }
+
+
+// const value = useMemo(() => ({
+//   isLoading,
+//   userId,
+//   setUserId,
+//   user,
+//   setUser
+// }), [isLoading, userId, user]);
