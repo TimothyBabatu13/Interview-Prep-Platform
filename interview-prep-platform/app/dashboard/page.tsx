@@ -32,10 +32,10 @@ const DashboardPage = () => {
 
         {/* Interview and Resume Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <InterviewSection creditsAvailable={5} />
           </div>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-1">
             <ResumeUpload onUpload={handleResumeUpload} />
           </div>
         </div>
