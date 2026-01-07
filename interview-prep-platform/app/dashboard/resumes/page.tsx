@@ -15,14 +15,6 @@ export default function InterviewPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeConfig, setActiveConfig] = useState<InterviewConfig | null>(null)
 
-  useEffect(() => {
-    const email = localStorage.getItem("user_email")
-    if (!email) {
-      window.location.href = "/login"
-    } else {
-      setUserEmail(email)
-    }
-  }, [])
 
   function handleStartInterview(config: InterviewConfig) {
     setIsLoading(true)
@@ -40,7 +32,7 @@ export default function InterviewPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader userEmail={userEmail} />
+      <DashboardHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {sessionState === "setup" && (
           <div className="space-y-8">

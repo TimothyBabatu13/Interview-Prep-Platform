@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useRouter } from "next/navigation"
 
 interface Feedback {
   id: string
@@ -34,7 +35,7 @@ const feedbacks = [
   ]
 
 export const FeedbackSection = () => {
-  
+  const router = useRouter();
   return (
     <Card>
       <CardHeader>
@@ -49,7 +50,13 @@ export const FeedbackSection = () => {
         ) : (
           <div className="space-y-4">
             {feedbacks.map((fb) => (
-              <div key={fb.id} className="border border-border rounded-lg p-4">
+              <div 
+                key={fb.id} 
+                className="border border-border rounded-lg p-4"
+                onClick={()=>{
+                  router.push(`/dashboard/resume/${fb.id}`)
+                }}
+              >
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h4 className="font-semibold text-foreground">{fb.title}</h4>
