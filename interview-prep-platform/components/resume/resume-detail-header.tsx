@@ -12,26 +12,26 @@ interface ResumeDetailHeaderProps {
   status: "analyzed" | "analyzing" | "pending"
 }
 
-export function ResumeDetailHeader({ name, uploadDate, overallScore, status }: ResumeDetailHeaderProps) {
-  const getScoreColor = (score: number) => {
-    if (score >= 8) return "bg-emerald-600/20 text-emerald-300 border-emerald-600/30"
-    if (score >= 6) return "bg-amber-600/20 text-amber-300 border-amber-600/30"
-    return "bg-rose-600/20 text-rose-300 border-rose-600/30"
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "analyzed":
+      return "default"
+    case "analyzing":
+      return "secondary"
+    case "pending":
+      return "outline"
+    default:
+      return "secondary"
   }
+}
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "analyzed":
-        return "default"
-      case "analyzing":
-        return "secondary"
-      case "pending":
-        return "outline"
-      default:
-        return "secondary"
-    }
-  }
+const getScoreColor = (score: number) => {
+  if (score >= 8) return "bg-emerald-600/20 text-emerald-300 border-emerald-600/30"
+  if (score >= 6) return "bg-amber-600/20 text-amber-300 border-amber-600/30"
+  return "bg-rose-600/20 text-rose-300 border-rose-600/30"
+}
 
+export const ResumeDetailHeader = ({ name, uploadDate, overallScore, status }: ResumeDetailHeaderProps) => {
   return (
     <div className="mb-8 border-b border-border/50 pb-8">
       <Link href="/dashboard">

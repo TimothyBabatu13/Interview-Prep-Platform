@@ -16,7 +16,7 @@ interface ImprovementsCarouselProps {
   bullets: BulletRewrite[]
 }
 
-export function ImprovementsCarousel({ bullets }: ImprovementsCarouselProps) {
+export const ImprovementsCarousel = ({ bullets }: ImprovementsCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
 

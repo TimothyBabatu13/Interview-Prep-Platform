@@ -15,7 +15,7 @@ interface IssuesShowcaseProps {
   issues: Issue[]
 }
 
-export function IssuesShowcase({ issues }: IssuesShowcaseProps) {
+export const IssuesShowcase = ({ issues }: IssuesShowcaseProps) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0)
 
   return (

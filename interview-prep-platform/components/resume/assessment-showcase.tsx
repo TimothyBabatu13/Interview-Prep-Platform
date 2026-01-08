@@ -8,7 +8,7 @@ interface AssessmentShowcaseProps {
   score: number
 }
 
-export function AssessmentShowcase({ assessment, score }: AssessmentShowcaseProps) {
+export const AssessmentShowcase = ({ assessment, score }: AssessmentShowcaseProps) => {
   const isPass = assessment.toLowerCase().includes("pass")
   const isExcellent = score >= 8
   const isGood = score >= 6
