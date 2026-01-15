@@ -3,9 +3,11 @@ import { StringValue } from "ms";
 
 const secret = process.env.JWT_SECRET!
 
-export const encryptToken = (id: string, time: number | StringValue) => {
+
+
+export const encryptToken = (id: string, time: number | StringValue, jti: string) => {
   return jwt.sign(
-    { userId: id },
+    { userId: id, jti },
     secret,
     { expiresIn: time }
   );

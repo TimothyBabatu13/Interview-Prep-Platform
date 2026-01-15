@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ipSigninLimit, userSigninLimit } from "@/lib/upstash/rate-limit";
 import { accessTokenExpireTime, calculateTime, formatZodError, getFingerprint } from "@/lib/utils";
 import { SignInValidation } from "@/validations/auth";
+import { v4 as uuidv4 } from "uuid"; 
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
@@ -34,14 +35,14 @@ export const POST = async (req: NextRequest) => {
 
         const { password, email } = validationData;
         
-        const userCheck = await userSigninLimit.limit(`${fingerprint}:${email}`);
+        // const userCheck = await userSigninLimit.limit(`${fingerprint}:${email}`);
         
-        if (!userCheck.success) {
-            return NextResponse.json(
-                { message: `Too many attempts for this account. Reset in ${calculateTime(userCheck.reset)}` },
-                { status: 429 }
-            );
-        }
+        // if (!userCheck.success) {
+        //     return NextResponse.json(
+        //         { message: `Too many attempts for this account. Reset in ${calculateTime(userCheck.reset)}` },
+        //         { status: 429 }
+        //     );
+        // }
 
         const supabase = await createClient();
         
@@ -60,13 +61,22 @@ export const POST = async (req: NextRequest) => {
         if (!correctPassowrd) {
             return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
         }
-
-        const accessToken = encryptToken(user.id, '5m');
-        const refreshToken = encryptToken(user.id, '7d');
+        
+        const accessJti = uuidv4();
+        const refreshJti = uuidv4();
+        
+        
+        const{ data: storeSessoonData, error: storeSessoonError } =  await supabase.from("active_tokens").insert([
+            { jti: accessJti, user_id: user.id, type: "access", expires_at: new Date(Date.now() + 5 * 60 * 1000) },
+            { jti: refreshJti, user_id: user.id, type: "refresh", expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }
+        ]);
+        
+        const accessToken = encryptToken(user.id, '5m', accessJti);
+        const refreshToken = encryptToken(user.id, '7d', refreshJti);
 
         const response = NextResponse.json({
             message: "Account Login Successfullly",
-            token: accessToken,
+            token: "logged in",
             data: { email: user?.email, id: user?.id }
         }, { status: 200 });
 
