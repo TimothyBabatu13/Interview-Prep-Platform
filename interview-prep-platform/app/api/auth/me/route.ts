@@ -20,6 +20,24 @@ export const GET = async (req: NextRequest) => {
         const validatedAccessToken = isTokenValid as DECREPTED_JWT_TYPE;
 
         const supabase = await createClient();
+        
+        
+        const { data: tokenRecord, error: tokenError } = await supabase
+        .from("active_tokens")
+        .select("revoked, expires_at")
+        .eq("jti", validatedAccessToken.jti)
+        .eq("type", "access")
+        .single();
+        
+        
+        if (tokenError || !tokenRecord) {
+            return NextResponse.json({ message: "Token not recognized" }, { status: 401 });
+        }
+        
+        if (tokenRecord.revoked || new Date(tokenRecord.expires_at) < new Date()) {
+            return NextResponse.json({ message: "Token expired or revoked" }, { status: 401 });
+        }
+
         const { data: user, error: findUserError } = await supabase
         .from("users")
         .select("email, id")
@@ -30,7 +48,7 @@ export const GET = async (req: NextRequest) => {
             return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
         }
 
-        return NextResponse.json({ message: "Account Details Fetched", data: { email: user?.email, id: user?.id } },{ status: 200 })
+        return NextResponse.json({ message: "Account Details Fetched", data: { email: user?.email, id: user?.id } }, { status: 200 })
 
     } catch (error) {
         return NextResponse.json({message: "Unexpected Server Error"}, { status: 500 })

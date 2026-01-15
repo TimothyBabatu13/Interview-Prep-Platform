@@ -3,7 +3,7 @@
 import { apiClient } from "@/lib/api/api-client";
 import { getToken } from "@/lib/memory";
 import { ME_TYPE, USER_TYPE } from "@/types/auth.types";
-import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 
 interface ContextProps {
   isLoading: boolean,
@@ -55,6 +55,9 @@ const AuthContext = ({  children } : {
     fetchUserToken();
   }, [])
 
+  // const value = useMemo(()=>{
+    
+  // }, [])
 
   return (
     <Context.Provider value={{isLoading: isLoading, setUserId: setUserId, userId: userId, user: user, setUser:setUser}}>

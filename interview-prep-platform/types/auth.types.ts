@@ -5,7 +5,8 @@ export interface USER_TYPE {
 export interface DECREPTED_JWT_TYPE {
     userId: string, 
     iat: number, 
-    exp: number 
+    exp: number ,
+    jti: string
 }
 
 export interface ME_TYPE {
